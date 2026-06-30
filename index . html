@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no">
+
     <title>2D Racing Car</title>
 
     <link rel="stylesheet" href="style.css">
@@ -14,8 +16,29 @@
 
     <canvas id="gameCanvas"></canvas>
 
-    <div id="loading">
-        Loading...
+    <!-- Mobile Controls -->
+    <div id="controls">
+
+        <div id="steering">
+
+            <button id="leftBtn" class="control-btn">
+                ◀
+            </button>
+
+            <button id="rightBtn" class="control-btn">
+                ▶
+            </button>
+
+        </div>
+
+        <div id="pedals">
+
+            <button id="accelBtn" class="control-btn accel">
+                ACCEL
+            </button>
+
+        </div>
+
     </div>
 
 </div>
