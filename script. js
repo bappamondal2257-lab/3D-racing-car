@@ -1,56 +1,111 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-const loading = document.getElementById("loading");
-
-function resize(){
-
+function resize() {
     canvas.width = window.innerWidth;
-
     canvas.height = window.innerHeight;
-
 }
 
-window.addEventListener("resize",resize);
-
+window.addEventListener("resize", resize);
 resize();
 
-loading.style.display="none";
+// ---------------------------
+// Road
+// ---------------------------
 
-let lastTime=0;
+const road = {
+    width: 240,
+    lineWidth: 8,
+    lineLength: 50,
+    lineGap: 30,
+    scroll: 0,
+    speed: 8
+};
 
-function update(delta){
+// ---------------------------
+// Player Car
+// ---------------------------
 
-    // Future physics update
+const car = {
+    width: 42,
+    height: 70,
+
+    x: canvas.width / 2,
+    y: canvas.height - 140,
+
+    color: "#ff3333"
+};
+
+// ---------------------------
+
+function update() {
+
+    road.scroll += road.speed;
+
+    const cycle = road.lineLength + road.lineGap;
+
+    if (road.scroll >= cycle) {
+        road.scroll = 0;
+    }
+
+    // Keep car centered after resize
+    car.y = canvas.height - 140;
+}
+
+// ---------------------------
+
+function drawGrass() {
+
+    ctx.fillStyle = "#3c9d40";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
 }
 
-function draw(){
+// ---------------------------
 
-    ctx.fillStyle="#3e8e41";
+function drawRoad() {
 
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+    const left = canvas.width / 2 - road.width / 2;
 
-    ctx.fillStyle="#555";
+    ctx.fillStyle = "#505050";
 
     ctx.fillRect(
-        canvas.width*0.25,
+        left,
         0,
-        canvas.width*0.5,
+        road.width,
         canvas.height
     );
 
-    ctx.strokeStyle="white";
+}
 
-    ctx.lineWidth=6;
+// ---------------------------
 
-    for(let y=0;y<canvas.height;y+=80){
+function drawLaneLines() {
+
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = road.lineWidth;
+
+    const center = canvas.width / 2;
+
+    const cycle = road.lineLength + road.lineGap;
+
+    for (
+        let y = -cycle;
+        y < canvas.height + cycle;
+        y += cycle
+    ) {
 
         ctx.beginPath();
 
-        ctx.moveTo(canvas.width/2,y);
+        ctx.moveTo(
+            center,
+            y + road.scroll
+        );
 
-        ctx.lineTo(canvas.width/2,y+40);
+        ctx.lineTo(
+            center,
+            y + road.scroll + road.lineLength
+        );
 
         ctx.stroke();
 
@@ -58,13 +113,94 @@ function draw(){
 
 }
 
-function gameLoop(timestamp){
+// ---------------------------
 
-    const delta=timestamp-lastTime;
+function drawRoadEdges() {
 
-    lastTime=timestamp;
+    const left = canvas.width / 2 - road.width / 2;
+    const right = canvas.width / 2 + road.width / 2;
 
-    update(delta);
+    ctx.strokeStyle = "#ffff55";
+    ctx.lineWidth = 4;
+
+    ctx.beginPath();
+    ctx.moveTo(left, 0);
+    ctx.lineTo(left, canvas.height);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(right, 0);
+    ctx.lineTo(right, canvas.height);
+    ctx.stroke();
+
+}
+
+// ---------------------------
+
+function drawCar() {
+
+    ctx.save();
+
+    ctx.translate(car.x, car.y);
+
+    // Body
+    ctx.fillStyle = car.color;
+
+    ctx.fillRect(
+        -car.width / 2,
+        -car.height / 2,
+        car.width,
+        car.height
+    );
+
+    // Windshield
+    ctx.fillStyle = "#87ceeb";
+
+    ctx.fillRect(
+        -12,
+        -18,
+        24,
+        20
+    );
+
+    // Wheels
+
+    ctx.fillStyle = "#111";
+
+    const wheelW = 6;
+    const wheelH = 16;
+
+    ctx.fillRect(-car.width / 2 - 4, -24, wheelW, wheelH);
+    ctx.fillRect(car.width / 2 - 2, -24, wheelW, wheelH);
+
+    ctx.fillRect(-car.width / 2 - 4, 8, wheelW, wheelH);
+    ctx.fillRect(car.width / 2 - 2, 8, wheelW, wheelH);
+
+    ctx.restore();
+
+}
+
+// ---------------------------
+
+function draw() {
+
+    drawGrass();
+
+    drawRoad();
+
+    drawLaneLines();
+
+    drawRoadEdges();
+
+    drawCar();
+
+}
+
+// ---------------------------
+
+function gameLoop() {
+
+    update();
 
     draw();
 
